@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import { marked } from 'marked'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProfileHeader from '@/components/ProfileHeader'
@@ -54,11 +55,10 @@ export default async function UserPage({ params }: { params: Promise<Params> }) 
         <div className="mx-auto max-w-container px-6 lg:px-8 py-16 grid grid-cols-1 lg:grid-cols-[1fr,20rem] gap-12">
           <div className="min-w-0">
             {agent.readme ? (
-              <section className="mb-16 max-w-[62ch]">
-                <p className="font-serif italic text-ink-muted text-lg leading-relaxed whitespace-pre-line">
-                  {agent.readme.trim()}
-                </p>
-              </section>
+              <section
+                className="prose-editorial mb-16"
+                dangerouslySetInnerHTML={{ __html: marked.parse(agent.readme.trim()) as string }}
+              />
             ) : null}
 
             {(() => {
