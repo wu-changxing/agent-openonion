@@ -14,13 +14,13 @@ import {
 
 type Params = { user: string; item: string }
 
-export function generateStaticParams(): Params[] {
+export async function generateStaticParams(): Promise<Params[]> {
   return getAllItemPaths()
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { user, item: slug } = await params
-  const found = getItem(user, slug)
+  const found = await getItem(user, slug)
   if (!found) return { title: 'Not found' }
   const { agent, item } = found
   const title = `${item.type === 'command' ? '/' : ''}${item.name} · @${agent.profile.alias}`
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function ItemPage({ params }: { params: Promise<Params> }) {
   const { user, item: slug } = await params
-  const found = getItem(user, slug)
+  const found = await getItem(user, slug)
   if (!found) notFound()
   const { agent, item } = found
   const target = itemInstallTarget(item.type, agent.profile.alias, item.slug)

@@ -1,8 +1,22 @@
-import fs from 'node:fs'
-import path from 'node:path'
+/**
+ * Registry client. Reads agent metadata from a remote source keyed by alias.
+ *
+ * Source of truth: https://github.com/openonion/agent-directory
+ * Default fetch URL: https://raw.githubusercontent.com/openonion/agent-directory/main
+ *
+ * Override with AGENT_REGISTRY_URL to point at a different host (e.g. an
+ * oo-api endpoint once it exists). The address (Ed25519 public key) in each
+ * directory entry is the canonical key — alias is the human-readable shortcut.
+ */
 
-const DATA_DIR = path.join(process.cwd(), 'data')
-const AGENTS_DIR = path.join(DATA_DIR, 'agents')
+const REGISTRY_URL =
+  process.env.AGENT_REGISTRY_URL ||
+  'https://raw.githubusercontent.com/openonion/agent-directory/main'
+
+const FETCH_OPTS: RequestInit = {
+  // Cache during build, revalidate hourly when running on a server.
+  next: { revalidate: 3600 },
+}
 
 export type ItemType = 'skill' | 'command' | 'agent' | 'post'
 
@@ -15,7 +29,6 @@ export type Item = {
   allowedTools?: string
   date?: string
   tags: string[]
-  body: string
   frontmatter: Record<string, string>
 }
 
@@ -50,6 +63,15 @@ export type DirectoryEntry = {
   featured: boolean
 }
 
+export type AgentManifest = {
+  profile: Profile
+  readme: string
+  skills: string[]
+  commands: string[]
+  subagents: string[]
+  posts: string[]
+}
+
 // ----- frontmatter (tiny, no dependency) -----------------------------------
 
 function parseFrontmatter(raw: string): { fm: Record<string, string>; body: string } {
@@ -72,18 +94,13 @@ function parseFrontmatter(raw: string): { fm: Record<string, string>; body: stri
   return { fm, body }
 }
 
-function readMarkdownItem(filePath: string, type: ItemType): Item | null {
-  if (!fs.existsSync(filePath)) return null
-  const raw = fs.readFileSync(filePath, 'utf8')
+function buildItem(raw: string, slug: string, type: ItemType): Item {
   const { fm, body } = parseFrontmatter(raw)
-  const slug = path.basename(filePath, '.md')
   const tags = (fm.tags || '').replace(/[\[\]]/g, '').split(',').map(t => t.trim()).filter(Boolean)
-
   let description = fm.description || ''
   if (!description && type === 'post') {
     description = body.split('\n').find(l => l.trim() && !l.startsWith('#'))?.trim() || ''
   }
-
   return {
     type,
     slug,
@@ -93,47 +110,83 @@ function readMarkdownItem(filePath: string, type: ItemType): Item | null {
     allowedTools: fm['allowed-tools'],
     date: fm.date,
     tags,
-    body,
     frontmatter: fm,
   }
 }
 
-function readDir(dir: string, type: ItemType): Item[] {
-  if (!fs.existsSync(dir)) return []
-  return fs
-    .readdirSync(dir)
-    .filter(f => f.endsWith('.md'))
-    .map(f => readMarkdownItem(path.join(dir, f), type))
-    .filter((x): x is Item => Boolean(x))
+// ----- registry fetchers ---------------------------------------------------
+
+async function fetchText(url: string): Promise<string | null> {
+  const res = await fetch(url, FETCH_OPTS)
+  if (!res.ok) return null
+  return res.text()
+}
+
+async function fetchJSON<T>(url: string): Promise<T | null> {
+  const res = await fetch(url, FETCH_OPTS)
+  if (!res.ok) return null
+  return res.json() as Promise<T>
+}
+
+/**
+ * Manifest lists which item slugs exist for an agent. The registry repo
+ * surfaces this via a manifest.json next to profile.json. To avoid having to
+ * commit a manifest, we shell out to the GitHub Trees API for the agent's
+ * subdirectories and treat anything ending in .md as an item.
+ */
+async function fetchAgentItemSlugs(alias: string, dir: string): Promise<string[]> {
+  // raw.githubusercontent.com doesn't list directories. Use the GitHub
+  // contents API for the registry repo instead.
+  const apiUrl = `https://api.github.com/repos/openonion/agent-directory/contents/agents/${alias}/${dir}`
+  const res = await fetch(apiUrl, {
+    ...FETCH_OPTS,
+    headers: process.env.GITHUB_TOKEN
+      ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
+      : {},
+  })
+  if (!res.ok) return []
+  const list = (await res.json()) as Array<{ name: string; type: string }>
+  return list
+    .filter(e => e.type === 'file' && e.name.endsWith('.md'))
+    .map(e => e.name.replace(/\.md$/, ''))
+}
+
+async function fetchItem(alias: string, dir: string, slug: string, type: ItemType): Promise<Item | null> {
+  const text = await fetchText(`${REGISTRY_URL}/agents/${alias}/${dir}/${slug}.md`)
+  if (!text) return null
+  return buildItem(text, slug, type)
+}
+
+async function fetchItems(alias: string, dir: string, type: ItemType): Promise<Item[]> {
+  const slugs = await fetchAgentItemSlugs(alias, dir)
+  const items = await Promise.all(slugs.map(s => fetchItem(alias, dir, s, type)))
+  return items.filter((x): x is Item => Boolean(x))
 }
 
 // ----- public API ----------------------------------------------------------
 
-export function getDirectory(): DirectoryEntry[] {
-  const file = path.join(DATA_DIR, 'directory.json')
-  const data = JSON.parse(fs.readFileSync(file, 'utf8'))
-  return data.agents as DirectoryEntry[]
+export async function getDirectory(): Promise<DirectoryEntry[]> {
+  const data = await fetchJSON<{ agents: DirectoryEntry[] }>(`${REGISTRY_URL}/directory.json`)
+  return data?.agents ?? []
 }
 
-export function getAllAgentAliases(): string[] {
-  return getDirectory().map(a => a.alias).filter(Boolean)
+export async function getAllAgentAliases(): Promise<string[]> {
+  return (await getDirectory()).map(a => a.alias).filter(Boolean)
 }
 
-export function getAgent(alias: string): Agent | null {
-  const agentDir = path.join(AGENTS_DIR, alias)
-  const profilePath = path.join(agentDir, 'profile.json')
-  if (!fs.existsSync(profilePath)) return null
+export async function getAgent(alias: string): Promise<Agent | null> {
+  const profile = await fetchJSON<Profile>(`${REGISTRY_URL}/agents/${alias}/profile.json`)
+  if (!profile) return null
 
-  const profile = JSON.parse(fs.readFileSync(profilePath, 'utf8')) as Profile
-  const readmePath = path.join(agentDir, 'README.md')
-  const readme = fs.existsSync(readmePath) ? fs.readFileSync(readmePath, 'utf8') : ''
+  const [readme, skills, commands, subagents, posts] = await Promise.all([
+    fetchText(`${REGISTRY_URL}/agents/${alias}/README.md`).then(t => t ?? ''),
+    fetchItems(alias, 'skills', 'skill'),
+    fetchItems(alias, 'commands', 'command'),
+    fetchItems(alias, 'agents', 'agent'),
+    fetchItems(alias, 'posts', 'post'),
+  ])
 
-  const skills = readDir(path.join(agentDir, 'skills'), 'skill')
-  const commands = readDir(path.join(agentDir, 'commands'), 'command')
-  const subagents = readDir(path.join(agentDir, 'agents'), 'agent')
-  const posts = readDir(path.join(agentDir, 'posts'), 'post').sort((a, b) =>
-    (b.date || '').localeCompare(a.date || ''),
-  )
+  posts.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
 
   return {
     profile,
@@ -146,18 +199,19 @@ export function getAgent(alias: string): Agent | null {
   }
 }
 
-export function getItem(alias: string, slug: string): { agent: Agent; item: Item } | null {
-  const agent = getAgent(alias)
+export async function getItem(alias: string, slug: string): Promise<{ agent: Agent; item: Item } | null> {
+  const agent = await getAgent(alias)
   if (!agent) return null
   const all = [...agent.skills, ...agent.commands, ...agent.subagents, ...agent.posts]
   const item = all.find(i => i.slug === slug)
   return item ? { agent, item } : null
 }
 
-export function getAllItemPaths(): { user: string; item: string }[] {
+export async function getAllItemPaths(): Promise<{ user: string; item: string }[]> {
+  const aliases = await getAllAgentAliases()
   const out: { user: string; item: string }[] = []
-  for (const alias of getAllAgentAliases()) {
-    const agent = getAgent(alias)
+  for (const alias of aliases) {
+    const agent = await getAgent(alias)
     if (!agent) continue
     for (const i of [...agent.skills, ...agent.commands, ...agent.subagents, ...agent.posts]) {
       out.push({ user: alias, item: i.slug })

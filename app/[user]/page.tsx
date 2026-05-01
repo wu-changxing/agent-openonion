@@ -10,28 +10,26 @@ import { getAgent, getAllAgentAliases, getDirectory } from '@/lib/agents'
 
 type Params = { user: string }
 
-export function generateStaticParams(): Params[] {
-  const aliases = getAllAgentAliases()
-  const directory = getDirectory()
-  // Include both alias and full address routes
+export async function generateStaticParams(): Promise<Params[]> {
+  const aliases = await getAllAgentAliases()
+  const directory = await getDirectory()
   return [
     ...aliases.map(user => ({ user })),
     ...directory.map(d => ({ user: d.address })),
   ]
 }
 
-function resolveAlias(userParam: string): string | null {
-  if (getAgent(userParam)) return userParam
-  const directory = getDirectory()
+async function resolveAlias(userParam: string): Promise<string | null> {
+  const directory = await getDirectory()
   const match = directory.find(d => d.address === userParam || d.alias === userParam)
   return match?.alias || null
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { user } = await params
-  const alias = resolveAlias(user)
+  const alias = await resolveAlias(user)
   if (!alias) return { title: 'Not found' }
-  const agent = getAgent(alias)
+  const agent = await getAgent(alias)
   if (!agent) return { title: 'Not found' }
   const title = `${agent.profile.name} (@${agent.profile.alias})`
   const description =
@@ -59,9 +57,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function UserPage({ params }: { params: Promise<Params> }) {
   const { user } = await params
-  const alias = resolveAlias(user)
+  const alias = await resolveAlias(user)
   if (!alias) notFound()
-  const agent = getAgent(alias!)
+  const agent = await getAgent(alias!)
   if (!agent) notFound()
 
   return (

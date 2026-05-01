@@ -6,19 +6,21 @@ import AgentCard from '@/components/AgentCard'
 import InstallSnippet from '@/components/InstallSnippet'
 import { getDirectory, getAgent } from '@/lib/agents'
 
-export default function HomePage() {
-  const directory = getDirectory()
+export default async function HomePage() {
+  const directory = await getDirectory()
   const featured = directory.filter(a => a.featured)
   const others = directory.filter(a => !a.featured)
 
-  const enriched = directory.map(entry => {
-    const agent = getAgent(entry.alias)
-    return {
-      entry,
-      itemCount: agent?.itemCount ?? 0,
-      avatar: agent?.profile.avatar,
-    }
-  })
+  const enriched = await Promise.all(
+    directory.map(async entry => {
+      const agent = await getAgent(entry.alias)
+      return {
+        entry,
+        itemCount: agent?.itemCount ?? 0,
+        avatar: agent?.profile.avatar,
+      }
+    }),
+  )
 
   const featuredEnriched = enriched.filter(e => e.entry.featured)
   const othersEnriched = enriched.filter(e => !e.entry.featured)
