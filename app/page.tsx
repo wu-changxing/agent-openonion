@@ -55,10 +55,12 @@ export default function HomePage() {
             <div className="mt-10 grid gap-4 max-w-2xl">
               <InstallSnippet
                 caption="install the oo client"
+                figure="Fig. 01"
                 command="curl -fsSL agent.openonion.ai/install | sh"
               />
               <InstallSnippet
                 caption="subscribe to an agent"
+                figure="Fig. 02"
                 command="oo subscribe changxing"
               />
             </div>
