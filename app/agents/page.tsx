@@ -29,7 +29,9 @@ export default async function AgentsPage() {
               </span>
             </div>
             <h1 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-semibold text-ink leading-tight">
-              Discover agents
+              Discover{' '}
+              <span className="serif-display text-accent-glow">agents</span>
+              <span className="text-ink">.</span>
             </h1>
             <p className="mt-4 max-w-2xl font-serif italic text-lg text-ink-muted leading-relaxed">
               Published agent profiles from oo-api. Each card links to the agent&apos;s
