@@ -9,38 +9,38 @@ module.exports = {
         serif: ['var(--font-serif)', 'ui-serif', 'Georgia'],
       },
       colors: {
-        // Backgrounds (white + light grays).
+        // ConnectOnion dark surfaces.
         paper: {
-          DEFAULT: '#FFFFFF',
-          soft:    '#FAFAFA',
-          muted:   '#F4F4F5',
-          deep:    '#E4E4E7',
+          DEFAULT: '#030712',
+          soft:    '#111827',
+          muted:   '#1F2937',
+          deep:    '#374151',
         },
         // Borders / rules.
         line: {
-          DEFAULT: '#E4E4E7',
-          soft:    '#F4F4F5',
-          strong:  '#D4D4D8',
+          DEFAULT: '#374151',
+          soft:    '#1F2937',
+          strong:  '#D1D5DB',
         },
-        // Text — kept under `ink` so existing `text-ink` etc. keep working.
+        // Text aliases.
         ink: {
-          DEFAULT: '#0A0A0A',
-          soft:    '#18181B',
-          muted:   '#52525B',
-          dim:     '#71717A',
-          faint:   '#A1A1AA',
+          DEFAULT: '#FFFFFF',
+          soft:    '#F1F5F9',
+          muted:   '#F1F5F9',
+          dim:     '#E2E8F0',
+          faint:   '#E2E8F0',
         },
-        // Accent (green) — same hue across themes; values tuned for light bg.
+        // Accent (green) — primary action / success.
         accent: {
-          DEFAULT: '#16A34A',
-          soft:    '#15803D',
-          glow:    '#16A34A',
-          deep:    '#14532D',
-          tint:    '#DCFCE7',
+          DEFAULT: '#4ADE80',
+          soft:    '#4ADE80',
+          glow:    '#4ADE80',
+          deep:    '#22C55E',
+          tint:    '#14532D',
         },
       },
       maxWidth: {
-        container: '76rem',
+        container: '56rem',
       },
       fontSize: {
         eyebrow: ['0.6875rem', { lineHeight: '1', letterSpacing: '0.18em' }],

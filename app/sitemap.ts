@@ -19,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.8,
     })
-    for (const item of [...agent.skills, ...agent.commands, ...agent.subagents, ...agent.posts]) {
+    for (const item of [...agent.skills, ...agent.subagents, ...agent.posts]) {
       entries.push({
         url: `${SITE}/${alias}/${item.slug}`,
         lastModified: item.date ? new Date(item.date) : now,

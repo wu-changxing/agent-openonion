@@ -17,10 +17,10 @@ export default function CopyButton({ value, label = 'Copy' }: { value: string; l
           /* ignore */
         }
       }}
-      className="inline-flex items-center gap-1.5 rounded-md border border-line px-2.5 py-1 text-xs text-ink-muted hover:text-ink hover:border-ink-dim transition-colors"
+      className="inline-flex min-h-[48px] items-center gap-2 rounded-md border border-gray-700 px-3 text-sm text-slate-100 hover:text-white hover:border-purple-400 hover:bg-gray-800 transition-colors"
       aria-label={copied ? 'Copied' : label}
     >
-      {copied ? <LuCheck className="h-3 w-3 text-accent-glow" /> : <LuCopy className="h-3 w-3" />}
+      {copied ? <LuCheck className="h-4 w-4 text-green-400" /> : <LuCopy className="h-4 w-4" />}
       <span>{copied ? 'Copied' : label}</span>
     </button>
   )

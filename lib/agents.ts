@@ -1,17 +1,9 @@
 /**
- * Registry client. Reads agent metadata from a remote source keyed by alias.
- *
- * Source of truth: https://github.com/openonion/agent-directory
- * Default fetch URL: https://raw.githubusercontent.com/openonion/agent-directory/main
- *
- * Override with AGENT_REGISTRY_URL to point at a different host (e.g. an
- * oo-api endpoint once it exists). The address (Ed25519 public key) in each
- * directory entry is the canonical key — alias is the human-readable shortcut.
+ * Registry client. Reads published agent metadata from oo-api.
  */
 
-const REGISTRY_URL =
-  process.env.AGENT_REGISTRY_URL ||
-  'https://raw.githubusercontent.com/openonion/agent-directory/main'
+const OO_API_URL =
+  (process.env.OO_API_URL || process.env.NEXT_PUBLIC_OO_API_URL || 'https://oo.openonion.ai').replace(/\/$/, '')
 
 const FETCH_OPTS: RequestInit = {
   // Cache during build, revalidate hourly when running on a server.
@@ -25,6 +17,7 @@ export type Item = {
   slug: string
   name: string
   description: string
+  sourceName?: string
   argumentHint?: string
   allowedTools?: string
   date?: string
@@ -44,9 +37,7 @@ export type Profile = {
 
 export type Agent = {
   profile: Profile
-  readme: string
   skills: Item[]
-  commands: Item[]
   subagents: Item[]
   posts: Item[]
   itemCount: number
@@ -61,15 +52,8 @@ export type DirectoryEntry = {
   ref: string
   tags: string[]
   featured: boolean
-}
-
-export type AgentManifest = {
-  profile: Profile
-  readme: string
-  skills: string[]
-  commands: string[]
-  subagents: string[]
-  posts: string[]
+  item_count?: number
+  updated_at?: string
 }
 
 // ----- frontmatter (tiny, no dependency) -----------------------------------
@@ -114,60 +98,86 @@ function buildItem(raw: string, slug: string, type: ItemType): Item {
   }
 }
 
-// ----- registry fetchers ---------------------------------------------------
-
-async function fetchText(url: string): Promise<string | null> {
-  const res = await fetch(url, FETCH_OPTS)
-  if (!res.ok) return null
-  return res.text()
-}
+// ----- oo-api --------------------------------------------------------------
 
 async function fetchJSON<T>(url: string): Promise<T | null> {
   const res = await fetch(url, FETCH_OPTS)
-  if (!res.ok) return null
+  if (res.status === 404) return null
+  if (!res.ok) throw new Error(`GET ${url} failed: ${res.status} ${res.statusText}`)
   return res.json() as Promise<T>
 }
 
-/**
- * Manifest lists which item slugs exist for an agent. The registry repo
- * surfaces this via a manifest.json next to profile.json. To avoid having to
- * commit a manifest, we shell out to the GitHub Trees API for the agent's
- * subdirectories and treat anything ending in .md as an item.
- */
-async function fetchAgentItemSlugs(alias: string, dir: string): Promise<string[]> {
-  // raw.githubusercontent.com doesn't list directories. Use the GitHub
-  // contents API for the registry repo instead.
-  const apiUrl = `https://api.github.com/repos/openonion/agent-directory/contents/agents/${alias}/${dir}`
-  const res = await fetch(apiUrl, {
-    ...FETCH_OPTS,
-    headers: process.env.GITHUB_TOKEN
-      ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
-      : {},
-  })
-  if (!res.ok) return []
-  const list = (await res.json()) as Array<{ name: string; type: string }>
-  return list
-    .filter(e => e.type === 'file' && e.name.endsWith('.md'))
-    .map(e => e.name.replace(/\.md$/, ''))
+type OoDirectory = {
+  agents: Array<{
+    address: string
+    alias?: string
+    name?: string
+    tagline?: string
+    repo?: string
+    ref?: string
+    tags?: string[]
+    featured?: boolean
+    item_count?: number
+    updated_at?: string
+  }>
 }
 
-async function fetchItem(alias: string, dir: string, slug: string, type: ItemType): Promise<Item | null> {
-  const text = await fetchText(`${REGISTRY_URL}/agents/${alias}/${dir}/${slug}.md`)
-  if (!text) return null
-  return buildItem(text, slug, type)
+type OoProfileResponse = {
+  profile: (Partial<Profile> & {
+    version?: string
+    skills?: Array<{ name: string; description?: string }>
+  }) | null
+  updated_at?: string | null
 }
 
-async function fetchItems(alias: string, dir: string, type: ItemType): Promise<Item[]> {
-  const slugs = await fetchAgentItemSlugs(alias, dir)
-  const items = await Promise.all(slugs.map(s => fetchItem(alias, dir, s, type)))
-  return items.filter((x): x is Item => Boolean(x))
+type OoSkillBodyResponse = {
+  name?: string
+  description?: string
+  body?: string
+  error?: string
+}
+
+function slugify(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'item'
+}
+
+function toDirectoryEntry(entry: OoDirectory['agents'][number]): DirectoryEntry {
+  const alias = entry.alias || entry.address
+  return {
+    address: entry.address,
+    alias,
+    name: entry.name || alias,
+    tagline: entry.tagline || '',
+    repo: entry.repo || '',
+    ref: entry.ref || '',
+    tags: entry.tags || [],
+    featured: Boolean(entry.featured),
+    item_count: entry.item_count,
+    updated_at: entry.updated_at,
+  }
+}
+
+function skillMetadataToItem(skill: { name: string; description?: string }): Item {
+  return {
+    type: 'skill',
+    slug: slugify(skill.name),
+    name: skill.name,
+    sourceName: skill.name,
+    description: skill.description || '',
+    tags: [],
+    frontmatter: {},
+  }
 }
 
 // ----- public API ----------------------------------------------------------
 
 export async function getDirectory(): Promise<DirectoryEntry[]> {
-  const data = await fetchJSON<{ agents: DirectoryEntry[] }>(`${REGISTRY_URL}/directory.json`)
-  return data?.agents ?? []
+  const data = await fetchJSON<OoDirectory>(`${OO_API_URL}/api/relay/directory`)
+  return data?.agents?.map(toDirectoryEntry) ?? []
 }
 
 export async function getAllAgentAliases(): Promise<string[]> {
@@ -175,46 +185,71 @@ export async function getAllAgentAliases(): Promise<string[]> {
 }
 
 export async function getAgent(alias: string): Promise<Agent | null> {
-  const profile = await fetchJSON<Profile>(`${REGISTRY_URL}/agents/${alias}/profile.json`)
-  if (!profile) return null
+  const directory = await getDirectory()
+  const entry = directory.find(a => a.alias === alias || a.address === alias)
+  if (!entry) return null
 
-  const [readme, skills, commands, subagents, posts] = await Promise.all([
-    fetchText(`${REGISTRY_URL}/agents/${alias}/README.md`).then(t => t ?? ''),
-    fetchItems(alias, 'skills', 'skill'),
-    fetchItems(alias, 'commands', 'command'),
-    fetchItems(alias, 'agents', 'agent'),
-    fetchItems(alias, 'posts', 'post'),
-  ])
+  const data = await fetchJSON<OoProfileResponse>(
+    `${OO_API_URL}/api/relay/agents/${encodeURIComponent(entry.address)}/profile`
+  )
+  if (!data?.profile) return null
 
-  posts.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+  const profile: Profile = {
+    address: entry.address,
+    alias: data.profile.alias || entry.alias,
+    name: data.profile.name || data.profile.alias || entry.name,
+    bio: data.profile.bio || entry.tagline,
+    avatar: data.profile.avatar || '',
+    links: data.profile.links || {},
+    tags: data.profile.tags || entry.tags,
+  }
+  const skills = (data.profile.skills || []).map(skillMetadataToItem)
 
   return {
     profile,
-    readme,
     skills,
-    commands,
-    subagents,
-    posts,
-    itemCount: skills.length + commands.length + subagents.length,
+    subagents: [],
+    posts: [],
+    itemCount: skills.length,
+  }
+}
+
+async function hydrateSkillBody(address: string, item: Item): Promise<Item> {
+  if (item.type !== 'skill') return item
+  const skillName = item.sourceName || item.name
+  const data = await fetchJSON<OoSkillBodyResponse>(
+    `${OO_API_URL}/api/relay/agents/${encodeURIComponent(address)}/skills/${encodeURIComponent(skillName)}`
+  )
+  if (!data?.body || data.error) return item
+
+  return {
+    ...buildItem(data.body, item.slug, 'skill'),
+    slug: item.slug,
+    sourceName: skillName,
+    description: data.description || item.description,
   }
 }
 
 export async function getItem(alias: string, slug: string): Promise<{ agent: Agent; item: Item } | null> {
   const agent = await getAgent(alias)
   if (!agent) return null
-  const all = [...agent.skills, ...agent.commands, ...agent.subagents, ...agent.posts]
+  const all = [...agent.skills, ...agent.subagents, ...agent.posts]
   const item = all.find(i => i.slug === slug)
-  return item ? { agent, item } : null
+  if (!item) return null
+
+  const hydrated = await hydrateSkillBody(agent.profile.address, item)
+  return { agent, item: hydrated }
 }
 
 export async function getAllItemPaths(): Promise<{ user: string; item: string }[]> {
   const aliases = await getAllAgentAliases()
+  const agents = await Promise.all(aliases.map(getAgent))
   const out: { user: string; item: string }[] = []
-  for (const alias of aliases) {
-    const agent = await getAgent(alias)
+  for (let i = 0; i < aliases.length; i++) {
+    const agent = agents[i]
     if (!agent) continue
-    for (const i of [...agent.skills, ...agent.commands, ...agent.subagents, ...agent.posts]) {
-      out.push({ user: alias, item: i.slug })
+    for (const it of [...agent.skills, ...agent.subagents, ...agent.posts]) {
+      out.push({ user: aliases[i], item: it.slug })
     }
   }
   return out

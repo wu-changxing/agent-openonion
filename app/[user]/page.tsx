@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { marked } from 'marked'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProfileHeader from '@/components/ProfileHeader'
@@ -68,21 +67,13 @@ export default async function UserPage({ params }: { params: Promise<Params> }) 
       <main id="main">
         <ProfileHeader profile={agent.profile} itemCount={agent.itemCount} />
 
-        <div className="mx-auto max-w-container px-6 lg:px-8 py-16 grid grid-cols-1 lg:grid-cols-[1fr,20rem] gap-12">
+        <div className="mx-auto max-w-container px-4 md:px-6 py-16 md:py-24 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr),18rem] gap-12">
           <div className="min-w-0">
-            {agent.readme ? (
-              <section
-                className="prose-editorial mb-16"
-                dangerouslySetInnerHTML={{ __html: marked.parse(agent.readme.trim()) as string }}
-              />
-            ) : null}
-
             {(() => {
               const sections = [
                 { numeral: 'I', title: 'Skills', epigraph: 'Reusable capabilities the agent can call on — each one a small unit of expertise.', items: agent.skills },
-                { numeral: 'II', title: 'Slash commands', epigraph: 'Single-shot operations triggered by name. Predictable inputs, predictable outputs.', items: agent.commands },
-                { numeral: 'III', title: 'Subagents', epigraph: 'Specialised collaborators with their own scope, tools, and tone of voice.', items: agent.subagents },
-                { numeral: 'IV', title: 'Posts', epigraph: 'Notes, demos, and stray thoughts published from the workshop floor.', items: agent.posts },
+                { numeral: 'II', title: 'Subagents', epigraph: 'Specialised collaborators with their own scope, tools, and tone of voice.', items: agent.subagents },
+                { numeral: 'III', title: 'Posts', epigraph: 'Notes, demos, and stray thoughts published from the workshop floor.', items: agent.posts },
               ]
               return sections
                 .filter(s => s.items.length > 0)
@@ -108,15 +99,15 @@ export default async function UserPage({ params }: { params: Promise<Params> }) 
 
           <aside className="lg:sticky lg:top-20 lg:self-start space-y-6">
             <div>
-              <p className="text-eyebrow uppercase text-ink-faint mb-3">Subscribe</p>
+              <p className="text-xs uppercase text-slate-200 mb-4">Subscribe</p>
               <InstallSnippet command={`oo subscribe ${agent.profile.alias}`} />
-              <p className="mt-3 text-xs text-ink-dim leading-relaxed">
+              <p className="mt-4 text-sm text-slate-100 leading-relaxed">
                 Installs into Claude Code, Codex, Cursor, Kiro, and OpenClaw — wherever you
-                have one. Re-run <code className="text-ink-muted">oo update</code> to refresh.
+                have one. Re-run <code className="text-white">oo update</code> to refresh.
               </p>
             </div>
             <div>
-              <p className="text-eyebrow uppercase text-ink-faint mb-3">Or by address</p>
+              <p className="text-xs uppercase text-slate-200 mb-4">Or by address</p>
               <InstallSnippet command={`oo subscribe ${agent.profile.address}`} />
             </div>
           </aside>
@@ -142,14 +133,14 @@ function Section({
 }) {
   return (
     <section className="mb-16">
-      <div className="flex items-baseline justify-between border-b border-line pb-3 mb-3">
-        <h2 className="text-h2 text-ink font-semibold flex items-baseline gap-3">
-          <span className="font-mono text-eyebrow text-ink-faint tracking-[0.2em]">§&nbsp;{numeral}</span>
+      <div className="flex items-baseline justify-between border-b border-gray-700 pb-4 mb-4">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl text-white font-bold flex items-baseline gap-3">
+          <span className="font-mono text-xs text-slate-200 tracking-normal">§&nbsp;{numeral}</span>
           {title}
         </h2>
-        <span className="font-mono text-xs text-ink-faint">{count}</span>
+        <span className="font-mono text-xs text-slate-200">{count}</span>
       </div>
-      <p className="font-serif italic text-ink-muted max-w-[58ch] mb-6">{epigraph}</p>
+      <p className="font-serif italic text-lg text-slate-100 max-w-[58ch] mb-6">{epigraph}</p>
       {children}
     </section>
   )

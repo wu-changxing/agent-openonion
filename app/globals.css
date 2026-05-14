@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 html, body {
-  background: #FFFFFF;
-  color: #0A0A0A;
+  background: #030712;
+  color: #F1F5F9;
   font-optical-sizing: auto;
 }
 
@@ -30,49 +30,49 @@ html, body {
   font-size: 7rem;
   line-height: 1;
   letter-spacing: -0.04em;
-  color: rgba(22, 163, 74, 0.10);
+  color: rgba(74, 222, 128, 0.12);
   pointer-events: none;
   user-select: none;
 }
 
 /* ---------- Editorial prose (markdown body) ---------- */
 .prose-editorial {
-  color: #18181B;
-  font-size: 1.0625rem;
+  color: #F1F5F9;
+  font-size: 1.125rem;
   line-height: 1.7;
   max-width: 68ch;
 }
-.prose-editorial > * + * { margin-top: 1.1em; }
+.prose-editorial > * + * { margin-top: 1rem; }
 .prose-editorial h1,
 .prose-editorial h2,
 .prose-editorial h3,
 .prose-editorial h4 {
   font-family: var(--font-sans), ui-sans-serif, system-ui;
   font-weight: 600;
-  color: #0A0A0A;
-  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  letter-spacing: 0;
   line-height: 1.25;
   margin-top: 2em;
   margin-bottom: 0.6em;
 }
-.prose-editorial h1 { font-size: 1.875rem; }
+.prose-editorial h1 { font-size: 3rem; }
 .prose-editorial h2 {
-  font-size: 1.5rem;
+  font-size: 2.25rem;
   padding-bottom: 0.4em;
-  border-bottom: 1px solid #E4E4E7;
+  border-bottom: 1px solid #374151;
 }
-.prose-editorial h3 { font-size: 1.25rem; }
-.prose-editorial h4 { font-size: 1.0625rem; color: #52525B; }
+.prose-editorial h3 { font-size: 1.5rem; }
+.prose-editorial h4 { font-size: 1.125rem; color: #F1F5F9; }
 .prose-editorial p { margin: 0; }
 .prose-editorial a {
-  color: #0A0A0A;
+  color: #C084FC;
   text-decoration: underline;
-  text-decoration-color: #16A34A;
+  text-decoration-color: #C084FC;
   text-underline-offset: 3px;
   text-decoration-thickness: 1.5px;
 }
-.prose-editorial a:hover { text-decoration-color: #0A0A0A; }
-.prose-editorial strong { color: #0A0A0A; font-weight: 600; }
+.prose-editorial a:hover { color: #FFFFFF; text-decoration-color: #FFFFFF; }
+.prose-editorial strong { color: #FFFFFF; font-weight: 600; }
 .prose-editorial em {
   font-family: var(--font-serif), ui-serif, Georgia, serif;
   font-style: italic;
@@ -89,30 +89,30 @@ html, body {
   content: "—";
   position: absolute;
   left: -1.25rem;
-  color: #A1A1AA;
+  color: #4ADE80;
 }
 .prose-editorial ol { list-style: decimal; }
 .prose-editorial li + li { margin-top: 0.4em; }
 .prose-editorial blockquote {
   margin: 0;
   padding: 0.4em 0 0.4em 1.25rem;
-  border-left: 2px solid #16A34A;
+  border-left: 2px solid #4ADE80;
   font-family: var(--font-serif), ui-serif, Georgia, serif;
   font-style: italic;
-  color: #52525B;
+  color: #E2E8F0;
 }
 .prose-editorial code {
   font-family: var(--font-mono), ui-monospace, SFMono-Regular;
   font-size: 0.875em;
-  background: #F4F4F5;
-  border: 1px solid #E4E4E7;
+  background: #1F2937;
+  border: 1px solid #374151;
   border-radius: 4px;
   padding: 0.1em 0.35em;
-  color: #18181B;
+  color: #F1F5F9;
 }
 .prose-editorial pre {
-  background: #FAFAFA;
-  border: 1px solid #E4E4E7;
+  background: #111827;
+  border: 1px solid #374151;
   border-radius: 8px;
   padding: 1rem 1.1rem;
   overflow-x: auto;
@@ -124,12 +124,12 @@ html, body {
   border: 0;
   padding: 0;
   font-size: inherit;
-  color: #18181B;
+  color: #F1F5F9;
 }
 .prose-editorial hr {
   border: 0;
   margin: 2.4em 0;
-  background-image: radial-gradient(circle, #A1A1AA 1px, transparent 1px);
+  background-image: radial-gradient(circle, #374151 1px, transparent 1px);
   background-size: 14px 1px;
   background-repeat: repeat-x;
   background-position: center;
@@ -144,27 +144,27 @@ html, body {
 .prose-editorial td {
   text-align: left;
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #E4E4E7;
+  border-bottom: 1px solid #374151;
 }
-.prose-editorial th { font-weight: 600; color: #0A0A0A; }
+.prose-editorial th { font-weight: 600; color: #FFFFFF; }
 
 .dot-leader {
   flex: 1 1 auto;
   overflow: hidden;
   white-space: nowrap;
   letter-spacing: 0.35em;
-  color: #A1A1AA;
+  color: #E2E8F0;
   transform: translateY(-3px);
   user-select: none;
 }
 
 ::selection {
-  background: rgba(22, 163, 74, 0.18);
-  color: #0A0A0A;
+  background: rgba(74, 222, 128, 0.24);
+  color: #FFFFFF;
 }
 
 a:focus-visible, button:focus-visible {
-  outline: 2px solid #16A34A;
+  outline: 2px solid #C084FC;
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -175,8 +175,8 @@ a:focus-visible, button:focus-visible {
   top: 0;
   z-index: 100;
   padding: 0.5rem 0.75rem;
-  background: #16A34A;
-  color: #fff;
+  background: #4ADE80;
+  color: #030712;
   font-size: 0.875rem;
 }
 
@@ -184,8 +184,8 @@ a:focus-visible, button:focus-visible {
   left: 0;
 }
 
-/* Subtle dotted background on hero — darker dots for the light theme. */
+/* Subtle dotted background on hero. */
 .bg-dots {
-  background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.06) 1px, transparent 0);
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.08) 1px, transparent 0);
   background-size: 22px 22px;
 }

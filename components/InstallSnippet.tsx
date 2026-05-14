@@ -10,11 +10,11 @@ export default function InstallSnippet({
   figure?: string
 }) {
   return (
-    <figure className="rounded-lg border border-line bg-paper-soft overflow-hidden transition-colors hover:border-ink-faint/50">
+    <figure className="rounded-lg border border-gray-700 bg-gray-800/30 overflow-hidden transition-colors hover:border-purple-400/50 hover:bg-gray-800/50">
       {(caption || figure) ? (
-        <figcaption className="flex items-center gap-3 px-4 py-2 border-b border-line">
+        <figcaption className="flex items-center gap-3 px-4 py-2 border-b border-gray-700">
           {caption ? (
-            <span className="font-mono text-eyebrow uppercase text-ink-faint tracking-[0.18em]">
+            <span className="font-mono text-xs uppercase text-slate-200 tracking-normal">
               {caption}
             </span>
           ) : null}
@@ -22,15 +22,15 @@ export default function InstallSnippet({
             {'·'.repeat(80)}
           </span>
           {figure ? (
-            <span className="font-serif italic text-xs text-ink-faint shrink-0">
+            <span className="font-serif italic text-xs text-slate-200 shrink-0">
               {figure}
             </span>
           ) : null}
         </figcaption>
       ) : null}
       <div className="flex items-start justify-between gap-3 px-4 py-3 font-mono text-sm">
-        <code className="text-ink leading-relaxed break-all">
-          <span className="text-accent-glow select-none">$ </span>
+        <code className="text-white leading-relaxed break-all py-3">
+          <span className="text-green-400 select-none">$ </span>
           {command}
         </code>
         <CopyButton value={command} />
