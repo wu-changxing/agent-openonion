@@ -233,14 +233,15 @@ export async function getItem(alias: string, slug: string): Promise<{ agent: Age
 }
 
 export async function getAllItemPaths(): Promise<{ user: string; item: string }[]> {
-  const aliases = await getAllAgentAliases()
-  const agents = await Promise.all(aliases.map(getAgent))
+  // URL paths are addresses, not aliases.
+  const directory = await getDirectory()
+  const agents = await Promise.all(directory.map(d => getAgent(d.address)))
   const out: { user: string; item: string }[] = []
-  for (let i = 0; i < aliases.length; i++) {
+  for (let i = 0; i < directory.length; i++) {
     const agent = agents[i]
     if (!agent) continue
     for (const it of [...agent.skills, ...agent.subagents, ...agent.posts]) {
-      out.push({ user: aliases[i], item: it.slug })
+      out.push({ user: directory[i].address, item: it.slug })
     }
   }
   return out

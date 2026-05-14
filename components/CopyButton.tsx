@@ -23,7 +23,7 @@ export default function CopyButton({ value, label = 'Copy' }: { value: string; l
       aria-label={text || 'Copy'}
       title={text || 'Copy'}
     >
-      {copied ? <LuCheck className="h-4 w-4 text-green-400" /> : <LuCopy className="h-4 w-4" />}
+      {copied ? <LuCheck className="h-4 w-4 text-accent-glow" /> : <LuCopy className="h-4 w-4" />}
       {text ? <span>{text}</span> : null}
     </button>
   )

@@ -9,34 +9,34 @@ module.exports = {
         serif: ['var(--font-serif)', 'ui-serif', 'Georgia'],
       },
       colors: {
-        // ConnectOnion dark surfaces.
+        // ConnectOnion light surfaces.
         paper: {
-          DEFAULT: '#030712',
-          soft:    '#111827',
-          muted:   '#1F2937',
-          deep:    '#374151',
+          DEFAULT: '#FFFFFF',
+          soft:    '#F8FAFC',
+          muted:   '#F1F5F9',
+          deep:    '#E2E8F0',
         },
         // Borders / rules.
         line: {
-          DEFAULT: '#374151',
-          soft:    '#1F2937',
-          strong:  '#D1D5DB',
+          DEFAULT: '#CBD5E1',
+          soft:    '#E2E8F0',
+          strong:  '#475569',
         },
         // Text aliases.
         ink: {
-          DEFAULT: '#FFFFFF',
-          soft:    '#F1F5F9',
-          muted:   '#F1F5F9',
-          dim:     '#E2E8F0',
-          faint:   '#E2E8F0',
+          DEFAULT: '#0F172A',
+          soft:    '#1E293B',
+          muted:   '#475569',
+          dim:     '#64748B',
+          faint:   '#94A3B8',
         },
         // Accent (green) — primary action / success.
         accent: {
-          DEFAULT: '#4ADE80',
-          soft:    '#4ADE80',
-          glow:    '#4ADE80',
-          deep:    '#22C55E',
-          tint:    '#14532D',
+          DEFAULT: '#16A34A',
+          soft:    '#22C55E',
+          glow:    '#15803D',
+          deep:    '#166534',
+          tint:    '#DCFCE7',
         },
       },
       maxWidth: {

@@ -3,37 +3,47 @@ import type { Item } from '@/lib/agents'
 import { itemTypeLabel } from '@/lib/agents'
 
 const typeColor: Record<Item['type'], string> = {
-  skill:   'text-green-400 border-green-400/40 bg-green-400/10',
-  command: 'text-blue-400 border-blue-400/40 bg-blue-400/10',
-  agent:   'text-purple-400 border-purple-400/40 bg-purple-400/10',
-  post:    'text-orange-400 border-orange-400/40 bg-orange-400/10',
+  skill:   'text-green-700 border-green-200 bg-green-50',
+  command: 'text-blue-700 border-blue-200 bg-blue-50',
+  agent:   'text-violet-700 border-violet-200 bg-violet-50',
+  post:    'text-orange-700 border-orange-200 bg-orange-50',
 }
 
-export default function ItemCard({ user, item }: { user: string; item: Item }) {
+export default function ItemCard({
+  user,
+  item,
+  showType = false,
+}: {
+  user: string
+  item: Item
+  showType?: boolean
+}) {
   return (
     <Link
       href={`/${user}/${item.slug}`}
-      className="group block min-h-[48px] rounded-lg border border-gray-700 bg-gray-800/30 hover:bg-gray-800/50 hover:border-purple-400/50 transition-colors p-6"
+      className="group block min-h-[48px] rounded-lg border border-line bg-paper p-6 transition-colors hover:border-accent-glow hover:bg-paper-soft"
     >
       <div className="flex items-start justify-between gap-3 mb-2">
-        <div className="font-mono text-sm text-white group-hover:text-purple-400 transition-colors truncate">
+        <div className="truncate font-mono text-sm text-ink transition-colors group-hover:text-accent-glow">
           {item.type === 'command' ? '/' : ''}
           {item.name}
         </div>
-        <span
-          className={`shrink-0 rounded border px-1.5 py-0.5 text-[10px] uppercase tracking-wider font-mono ${typeColor[item.type]}`}
-        >
-          {itemTypeLabel(item.type)}
-        </span>
+        {showType ? (
+          <span
+            className={`shrink-0 rounded border px-1.5 py-0.5 text-[10px] uppercase tracking-wider font-mono ${typeColor[item.type]}`}
+          >
+            {itemTypeLabel(item.type)}
+          </span>
+        ) : null}
       </div>
 
       {item.description ? (
-        <p className="text-sm text-slate-100 line-clamp-3">{item.description}</p>
+        <p className="line-clamp-3 text-sm leading-relaxed text-ink-muted">{item.description}</p>
       ) : null}
 
       {item.argumentHint ? (
-        <div className="mt-4 font-mono text-xs text-slate-200 truncate">
-          <span className="text-slate-200">args: </span>
+        <div className="mt-4 truncate font-mono text-xs text-ink-dim">
+          <span className="text-ink-muted">args: </span>
           {item.argumentHint}
         </div>
       ) : null}

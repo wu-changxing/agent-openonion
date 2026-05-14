@@ -5,36 +5,33 @@ import Footer from '@/components/Footer'
 import ProfileHeader from '@/components/ProfileHeader'
 import ItemCard from '@/components/ItemCard'
 import InstallSnippet from '@/components/InstallSnippet'
-import { getAgent, getAllAgentAliases, getDirectory } from '@/lib/agents'
+import AgentPrompt from '@/components/AgentPrompt'
+import { getAgent, getDirectory } from '@/lib/agents'
 
 type Params = { user: string }
 
+// URL paths are addresses only — aliases are display-only (a paid-tier
+// feature later), so we never emit alias-shaped routes.
 export async function generateStaticParams(): Promise<Params[]> {
-  const aliases = await getAllAgentAliases()
   const directory = await getDirectory()
-  return [
-    ...aliases.map(user => ({ user })),
-    ...directory.map(d => ({ user: d.address })),
-  ]
+  return directory.map(d => ({ user: d.address }))
 }
 
-async function resolveAlias(userParam: string): Promise<string | null> {
+async function isKnownAddress(userParam: string): Promise<boolean> {
   const directory = await getDirectory()
-  const match = directory.find(d => d.address === userParam || d.alias === userParam)
-  return match?.alias || null
+  return directory.some(d => d.address === userParam)
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { user } = await params
-  const alias = await resolveAlias(user)
-  if (!alias) return { title: 'Not found' }
-  const agent = await getAgent(alias)
+  if (!(await isKnownAddress(user))) return { title: 'Not found' }
+  const agent = await getAgent(user)
   if (!agent) return { title: 'Not found' }
   const title = `${agent.profile.name} (@${agent.profile.alias})`
   const description =
     agent.profile.bio ||
     `${agent.profile.name}'s public AI-agent homepage — ${agent.itemCount} published skills, commands, and subagents on agent.openonion.ai.`
-  const canonical = `https://agent.openonion.ai/${agent.profile.alias}`
+  const canonical = `https://agent.openonion.ai/${agent.profile.address}`
   return {
     title,
     description,
@@ -56,9 +53,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function UserPage({ params }: { params: Promise<Params> }) {
   const { user } = await params
-  const alias = await resolveAlias(user)
-  if (!alias) notFound()
-  const agent = await getAgent(alias!)
+  if (!(await isKnownAddress(user))) notFound()
+  const agent = await getAgent(user)
   if (!agent) notFound()
 
   return (
@@ -82,13 +78,13 @@ export default async function UserPage({ params }: { params: Promise<Params> }) 
                     {s.title === 'Posts' ? (
                       <div className="space-y-3">
                         {s.items.map(item => (
-                          <ItemCard key={item.slug} user={agent.profile.alias} item={item} />
+                          <ItemCard key={item.slug} user={agent.profile.address} item={item} />
                         ))}
                       </div>
                     ) : (
                       <Grid>
                         {s.items.map(item => (
-                          <ItemCard key={item.slug} user={agent.profile.alias} item={item} />
+                          <ItemCard key={item.slug} user={agent.profile.address} item={item} />
                         ))}
                       </Grid>
                     )}
@@ -97,18 +93,30 @@ export default async function UserPage({ params }: { params: Promise<Params> }) 
             })()}
           </div>
 
-          <aside className="lg:sticky lg:top-20 lg:self-start space-y-6">
+          <aside className="lg:sticky lg:top-20 lg:self-start space-y-8">
             <div>
-              <p className="text-xs uppercase text-slate-200 mb-4">Subscribe</p>
-              <InstallSnippet command={`oo subscribe ${agent.profile.alias}`} />
-              <p className="mt-4 text-sm text-slate-100 leading-relaxed">
+              <p className="mb-4 text-eyebrow uppercase text-ink-faint">§&nbsp;&nbsp;Subscribe</p>
+              <InstallSnippet
+                command={`oo subscribe ${agent.profile.address}`}
+                caption="in your shell"
+                figure="Fig. 01"
+              />
+              <p className="mt-4 text-sm leading-relaxed text-ink-muted">
                 Installs into Claude Code, Codex, Cursor, Kiro, and OpenClaw — wherever you
-                have one. Re-run <code className="text-white">oo update</code> to refresh.
+                have one. Re-run <code className="text-ink">oo update</code> to refresh.
               </p>
             </div>
             <div>
-              <p className="text-xs uppercase text-slate-200 mb-4">Or by address</p>
-              <InstallSnippet command={`oo subscribe ${agent.profile.address}`} />
+              <p className="mb-4 text-eyebrow uppercase text-ink-faint">§&nbsp;&nbsp;Ask your agent</p>
+              <AgentPrompt
+                prompt={`/oo subscribe ${agent.profile.address}`}
+                caption="paste into the chat"
+                figure="Fig. 02"
+              />
+              <p className="mt-4 text-sm leading-relaxed text-ink-muted">
+                Works in any agent that has the <code className="text-ink">oo</code> skill
+                installed — it resolves the address and runs the subscribe flow for you.
+              </p>
             </div>
           </aside>
         </div>
@@ -132,15 +140,21 @@ function Section({
   children: React.ReactNode
 }) {
   return (
-    <section className="mb-16">
-      <div className="flex items-baseline justify-between border-b border-gray-700 pb-4 mb-4">
-        <h2 className="text-2xl md:text-3xl lg:text-4xl text-white font-bold flex items-baseline gap-3">
-          <span className="font-mono text-xs text-slate-200 tracking-normal">§&nbsp;{numeral}</span>
+    <section className="relative mb-16">
+      <span
+        aria-hidden
+        className="numeral-watermark absolute -top-10 right-2 hidden md:block translate-x-2"
+      >
+        {numeral}
+      </span>
+      <div className="relative mb-4 flex items-baseline justify-between border-b border-line pb-4">
+        <h2 className="flex items-baseline gap-3 text-2xl md:text-3xl lg:text-4xl font-semibold text-ink">
+          <span className="font-mono text-eyebrow text-ink-faint">§&nbsp;{numeral}</span>
           {title}
         </h2>
-        <span className="font-mono text-xs text-slate-200">{count}</span>
+        <span className="font-mono text-xs text-ink-faint">{count}</span>
       </div>
-      <p className="font-serif italic text-lg text-slate-100 max-w-[58ch] mb-6">{epigraph}</p>
+      <p className="mb-6 max-w-[58ch] font-serif text-lg italic text-ink-muted">{epigraph}</p>
       {children}
     </section>
   )

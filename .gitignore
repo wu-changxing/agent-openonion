@@ -6,3 +6,10 @@ out/
 .env*
 !.env.example
 .vercel
+
+# local oo client state + claude harness state
+.co/
+.claude/
+
+# build-time agent cache fetched from openonion/agent-directory
+/data/

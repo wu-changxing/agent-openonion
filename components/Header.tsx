@@ -52,8 +52,8 @@ export default function Header() {
           </a>
           <span className="hidden sm:block w-px h-5 bg-line mx-1" aria-hidden />
           <Link
-            href="/#install"
-            className="ml-1 inline-flex min-h-[48px] min-w-[48px] items-center justify-center gap-2 rounded-md border border-accent-glow bg-accent-glow px-3 sm:px-4 font-mono text-sm text-gray-950 hover:bg-accent-soft transition-colors"
+            href="/install"
+            className="ml-1 inline-flex min-h-[48px] min-w-[48px] items-center justify-center gap-2 rounded-md border border-accent-glow bg-accent-glow px-3 font-mono text-sm text-white transition-colors hover:bg-accent-deep sm:px-4"
           >
             <LuTerminal className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">install</span>

@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html, body {
-  background: #030712;
-  color: #F1F5F9;
+  background: #FFFFFF;
+  color: #0F172A;
   font-optical-sizing: auto;
 }
 
@@ -27,17 +27,17 @@ html, body {
   font-family: var(--font-serif), ui-serif, Georgia, serif;
   font-style: italic;
   font-weight: 500;
-  font-size: 7rem;
+  font-size: 9rem;
   line-height: 1;
   letter-spacing: 0;
-  color: rgba(74, 222, 128, 0.12);
+  color: rgba(22, 163, 74, 0.18);
   pointer-events: none;
   user-select: none;
 }
 
 /* ---------- Editorial prose (markdown body) ---------- */
 .prose-editorial {
-  color: #F1F5F9;
+  color: #1E293B;
   font-size: 1.125rem;
   line-height: 1.7;
   max-width: 68ch;
@@ -49,7 +49,7 @@ html, body {
 .prose-editorial h4 {
   font-family: var(--font-sans), ui-sans-serif, system-ui;
   font-weight: 600;
-  color: #FFFFFF;
+  color: #0F172A;
   letter-spacing: 0;
   line-height: 1.25;
   margin-top: 2em;
@@ -59,20 +59,20 @@ html, body {
 .prose-editorial h2 {
   font-size: 2.25rem;
   padding-bottom: 0.4em;
-  border-bottom: 1px solid #374151;
+  border-bottom: 1px solid #CBD5E1;
 }
 .prose-editorial h3 { font-size: 1.5rem; }
-.prose-editorial h4 { font-size: 1.125rem; color: #F1F5F9; }
+.prose-editorial h4 { font-size: 1.125rem; color: #1E293B; }
 .prose-editorial p { margin: 0; }
 .prose-editorial a {
-  color: #C084FC;
+  color: #15803D;
   text-decoration: underline;
-  text-decoration-color: #C084FC;
+  text-decoration-color: #15803D;
   text-underline-offset: 3px;
   text-decoration-thickness: 1.5px;
 }
-.prose-editorial a:hover { color: #FFFFFF; text-decoration-color: #FFFFFF; }
-.prose-editorial strong { color: #FFFFFF; font-weight: 600; }
+.prose-editorial a:hover { color: #0F172A; text-decoration-color: #0F172A; }
+.prose-editorial strong { color: #0F172A; font-weight: 600; }
 .prose-editorial em {
   font-family: var(--font-serif), ui-serif, Georgia, serif;
   font-style: italic;
@@ -89,30 +89,30 @@ html, body {
   content: "—";
   position: absolute;
   left: -1.25rem;
-  color: #4ADE80;
+  color: #16A34A;
 }
 .prose-editorial ol { list-style: decimal; }
 .prose-editorial li + li { margin-top: 0.4em; }
 .prose-editorial blockquote {
   margin: 0;
   padding: 0.4em 0 0.4em 1.25rem;
-  border-left: 2px solid #4ADE80;
+  border-left: 2px solid #16A34A;
   font-family: var(--font-serif), ui-serif, Georgia, serif;
   font-style: italic;
-  color: #E2E8F0;
+  color: #475569;
 }
 .prose-editorial code {
   font-family: var(--font-mono), ui-monospace, SFMono-Regular;
   font-size: 0.875em;
-  background: #1F2937;
-  border: 1px solid #374151;
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
   border-radius: 4px;
   padding: 0.1em 0.35em;
-  color: #F1F5F9;
+  color: #0F172A;
 }
 .prose-editorial pre {
-  background: #111827;
-  border: 1px solid #374151;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
   border-radius: 8px;
   padding: 1rem 1.1rem;
   overflow-x: auto;
@@ -124,12 +124,12 @@ html, body {
   border: 0;
   padding: 0;
   font-size: inherit;
-  color: #F1F5F9;
+  color: #0F172A;
 }
 .prose-editorial hr {
   border: 0;
   margin: 2.4em 0;
-  background-image: radial-gradient(circle, #374151 1px, transparent 1px);
+  background-image: radial-gradient(circle, #CBD5E1 1px, transparent 1px);
   background-size: 14px 1px;
   background-repeat: repeat-x;
   background-position: center;
@@ -144,27 +144,27 @@ html, body {
 .prose-editorial td {
   text-align: left;
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #374151;
+  border-bottom: 1px solid #CBD5E1;
 }
-.prose-editorial th { font-weight: 600; color: #FFFFFF; }
+.prose-editorial th { font-weight: 600; color: #0F172A; }
 
 .dot-leader {
   flex: 1 1 auto;
   overflow: hidden;
   white-space: nowrap;
   letter-spacing: 0.35em;
-  color: #E2E8F0;
+  color: #CBD5E1;
   transform: translateY(-3px);
   user-select: none;
 }
 
 ::selection {
-  background: rgba(74, 222, 128, 0.24);
-  color: #FFFFFF;
+  background: rgba(22, 163, 74, 0.18);
+  color: #0F172A;
 }
 
 a:focus-visible, button:focus-visible {
-  outline: 2px solid #C084FC;
+  outline: 2px solid #16A34A;
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -175,8 +175,8 @@ a:focus-visible, button:focus-visible {
   top: 0;
   z-index: 100;
   padding: 0.5rem 0.75rem;
-  background: #4ADE80;
-  color: #030712;
+  background: #16A34A;
+  color: #FFFFFF;
   font-size: 0.875rem;
 }
 
@@ -186,6 +186,6 @@ a:focus-visible, button:focus-visible {
 
 /* Subtle dotted background on hero. */
 .bg-dots {
-  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.08) 1px, transparent 0);
+  background-image: radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.12) 1px, transparent 0);
   background-size: 22px 22px;
 }

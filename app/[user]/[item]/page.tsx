@@ -5,6 +5,7 @@ import { LuArrowLeft, LuLock } from 'react-icons/lu'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import InstallSnippet from '@/components/InstallSnippet'
+import AgentPrompt from '@/components/AgentPrompt'
 import {
   getItem,
   getAllItemPaths,
@@ -26,8 +27,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const title = `${item.type === 'command' ? '/' : ''}${item.name} · @${agent.profile.alias}`
   const description =
     item.description ||
-    `${itemTypeLabel(item.type)} published by ${agent.profile.name} on agent.openonion.ai. Subscribe with: oo subscribe ${agent.profile.alias}`
-  const canonical = `https://agent.openonion.ai/${agent.profile.alias}/${item.slug}`
+    `${itemTypeLabel(item.type)} published by ${agent.profile.name} on agent.openonion.ai. Subscribe with: oo subscribe ${agent.profile.address}`
+  const canonical = `https://agent.openonion.ai/${agent.profile.address}/${item.slug}`
   return {
     title,
     description,
@@ -56,10 +57,10 @@ export default async function ItemPage({ params }: { params: Promise<Params> }) 
     <>
       <Header />
       <main id="main">
-        <div className="mx-auto max-w-container px-6 lg:px-8 py-10">
+        <div className="mx-auto max-w-container px-4 md:px-6 py-16 md:py-24">
           <Link
-            href={`/${agent.profile.alias}`}
-            className="inline-flex items-center gap-1.5 text-sm text-ink-muted hover:text-ink"
+            href={`/${agent.profile.address}`}
+            className="inline-flex min-h-[48px] items-center gap-1.5 text-sm text-ink-muted hover:text-accent-glow"
           >
             <LuArrowLeft className="h-4 w-4" /> {agent.profile.name}
           </Link>
@@ -76,7 +77,7 @@ export default async function ItemPage({ params }: { params: Promise<Params> }) 
                 ) : null}
                 <span className="font-mono text-xs text-ink-faint">{item.slug}.md</span>
               </div>
-              <h1 className="text-h1 font-semibold text-ink break-words leading-[1.05]">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-ink break-words leading-[1.05]">
                 {item.type === 'command' ? <span className="text-accent-glow">/</span> : ''}
                 {item.name}
               </h1>
@@ -123,12 +124,24 @@ export default async function ItemPage({ params }: { params: Promise<Params> }) 
               {item.type !== 'post' ? (
                 <>
                   <div>
-                    <p className="text-eyebrow uppercase text-ink-faint mb-3">Subscribe to get this</p>
-                    <InstallSnippet command={`oo subscribe ${agent.profile.alias}`} />
+                    <p className="text-eyebrow uppercase text-ink-faint mb-4">§&nbsp;&nbsp;Subscribe</p>
+                    <InstallSnippet
+                      command={`oo subscribe ${agent.profile.address}`}
+                      caption="in your shell"
+                      figure="Fig. 01"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-eyebrow uppercase text-ink-faint mb-4">§&nbsp;&nbsp;Ask your agent</p>
+                    <AgentPrompt
+                      prompt={`/oo subscribe ${agent.profile.address}`}
+                      caption="paste into the chat"
+                      figure="Fig. 02"
+                    />
                   </div>
                   {target ? (
                     <div>
-                      <p className="text-eyebrow uppercase text-ink-faint mb-3">Lands at</p>
+                      <p className="text-eyebrow uppercase text-ink-faint mb-4">§&nbsp;&nbsp;Lands at</p>
                       <code className="block rounded-md border border-line bg-paper-soft px-3 py-2 font-mono text-xs text-ink-muted break-all">
                         {target}
                       </code>
@@ -139,7 +152,7 @@ export default async function ItemPage({ params }: { params: Promise<Params> }) 
 
               {item.tags?.length ? (
                 <div>
-                  <p className="text-eyebrow uppercase text-ink-faint mb-3">Tags</p>
+                  <p className="text-eyebrow uppercase text-ink-faint mb-4">§&nbsp;&nbsp;Tags</p>
                   <div className="flex flex-wrap gap-1.5">
                     {item.tags.map(tag => (
                       <span
@@ -154,13 +167,13 @@ export default async function ItemPage({ params }: { params: Promise<Params> }) 
               ) : null}
 
               <div>
-                <p className="text-eyebrow uppercase text-ink-faint mb-3">Author</p>
+                <p className="text-eyebrow uppercase text-ink-faint mb-4">§&nbsp;&nbsp;Author</p>
                 <Link
-                  href={`/${agent.profile.alias}`}
-                  className="block rounded-lg border border-line bg-paper-soft p-4 hover:bg-paper-muted hover:border-ink-faint/40 transition-colors"
+                  href={`/${agent.profile.address}`}
+                  className="block min-h-[48px] rounded-lg border border-line bg-paper-soft p-4 hover:bg-paper-muted hover:border-accent-glow transition-colors"
                 >
                   <div className="text-ink font-medium">{agent.profile.name}</div>
-                  <div className="font-mono text-xs text-ink-dim mt-1">
+                  <div className="font-serif italic text-sm text-accent-glow mt-1">
                     @{agent.profile.alias}
                   </div>
                 </Link>

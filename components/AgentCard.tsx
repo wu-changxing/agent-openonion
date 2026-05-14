@@ -15,8 +15,8 @@ export default function AgentCard({
 }) {
   return (
     <Link
-      href={`/${entry.alias || entry.address}`}
-      className="group relative block rounded-xl border border-line bg-paper p-6 transition-all duration-200 hover:border-ink/30 hover:-translate-y-0.5 hover:shadow-[0_2px_0_0_rgba(10,10,10,0.04),0_8px_24px_-12px_rgba(10,10,10,0.18)]"
+      href={`/${entry.address}`}
+      className="group relative block rounded-lg border border-line bg-paper p-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-glow hover:bg-paper-soft hover:shadow-[0_2px_0_0_rgba(10,10,10,0.04),0_8px_24px_-12px_rgba(10,10,10,0.18)]"
     >
       <LuArrowUpRight
         className="absolute top-5 right-5 h-4 w-4 text-ink-faint opacity-0 -translate-x-0.5 translate-y-0.5 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:text-accent-glow"
@@ -40,14 +40,14 @@ export default function AgentCard({
           <div className="flex items-baseline gap-2">
             <span className="text-ink font-medium">{entry.name}</span>
             {entry.alias ? (
-              <span className="font-mono text-xs text-ink-dim">@{entry.alias}</span>
+              <span className="font-serif italic text-sm text-accent-glow">@{entry.alias}</span>
             ) : null}
           </div>
           <p className="mt-1 text-sm text-ink-muted line-clamp-2 leading-relaxed">{entry.tagline}</p>
         </div>
       </div>
 
-      <div className="mt-5 flex items-center gap-3 text-xs text-ink-faint font-mono">
+      <div className="mt-4 flex items-center gap-3 text-xs text-ink-faint font-mono">
         <span>{shortAddress(entry.address)}</span>
         <span className="dot-leader text-[10px]" aria-hidden>{'·'.repeat(80)}</span>
         {typeof itemCount === 'number' ? (
@@ -58,7 +58,7 @@ export default function AgentCard({
       </div>
 
       {entry.tags?.length ? (
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <div className="mt-4 flex flex-wrap gap-1.5">
           {entry.tags.slice(0, 4).map(tag => (
             <span
               key={tag}

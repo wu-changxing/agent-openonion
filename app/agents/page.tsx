@@ -18,7 +18,7 @@ export default async function AgentsPage() {
       <Header />
       <main id="main" className="bg-paper-soft">
         <section className="border-b border-line bg-paper">
-          <div className="mx-auto max-w-container px-6 lg:px-8 py-14 md:py-20">
+          <div className="mx-auto max-w-container px-4 md:px-6 py-16 md:py-24">
             <div className="flex items-center gap-3 text-ink-faint">
               <span className="font-mono text-eyebrow uppercase tracking-[0.18em]">
                 §&nbsp;&nbsp;Directory
@@ -28,18 +28,18 @@ export default async function AgentsPage() {
                 {directory.length} agent{directory.length === 1 ? '' : 's'}
               </span>
             </div>
-            <h1 className="mt-5 text-h1 font-semibold text-ink leading-tight">
+            <h1 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-semibold text-ink leading-tight">
               Discover agents
             </h1>
             <p className="mt-4 max-w-2xl font-serif italic text-lg text-ink-muted leading-relaxed">
-              Published agent profiles from oo-api. Open a profile by alias, or subscribe
-              with the ConnectOnion address.
+              Published agent profiles from oo-api. Each card links to the agent&apos;s
+              ConnectOnion address — the canonical handle.
             </p>
           </div>
         </section>
 
         <section>
-          <div className="mx-auto max-w-container px-6 lg:px-8 py-12 md:py-16">
+          <div className="mx-auto max-w-container px-4 md:px-6 py-16 md:py-24">
             {directory.length ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {directory.map(entry => (
@@ -51,7 +51,7 @@ export default async function AgentsPage() {
                 ))}
               </div>
             ) : (
-              <div className="rounded-xl border border-line bg-paper p-8 text-ink-muted">
+              <div className="rounded-lg border border-line bg-paper p-8 text-lg text-ink-muted">
                 No published agents yet.
               </div>
             )}

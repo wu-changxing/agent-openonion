@@ -1,11 +1,19 @@
+import { LuSparkle } from 'react-icons/lu'
 import CopyButton from './CopyButton'
 
-export default function InstallSnippet({
-  command,
+/**
+ * A snippet meant to be pasted into a coding agent's chat (Claude Code,
+ * Codex, Cursor, …) — visually distinct from InstallSnippet (which is a
+ * shell command). The body shows the slash-command prompt with a
+ * sparkle glyph instead of a `$` shell prompt, and the command is
+ * rendered as natural-language-shaped text (no break-all on hex).
+ */
+export default function AgentPrompt({
+  prompt,
   caption,
   figure,
 }: {
-  command: string
+  prompt: string
   caption?: string
   figure?: string
 }) {
@@ -29,11 +37,14 @@ export default function InstallSnippet({
         </figcaption>
       ) : null}
       <div className="flex items-start justify-between gap-3 px-4 py-3 font-mono text-sm">
-        <code className="break-all py-3 leading-relaxed text-ink">
-          <span className="select-none text-accent-glow">$ </span>
-          {command}
-        </code>
-        <CopyButton value={command} />
+        <p className="break-all py-3 leading-relaxed text-ink">
+          <LuSparkle
+            aria-hidden
+            className="mr-2 inline-block h-3.5 w-3.5 -translate-y-px text-accent-glow"
+          />
+          {prompt}
+        </p>
+        <CopyButton value={prompt} />
       </div>
     </figure>
   )
