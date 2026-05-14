@@ -20,7 +20,7 @@ html, body {
   font-family: var(--font-serif), ui-serif, Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .numeral-watermark {
@@ -29,7 +29,7 @@ html, body {
   font-weight: 500;
   font-size: 7rem;
   line-height: 1;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
   color: rgba(74, 222, 128, 0.12);
   pointer-events: none;
   user-select: none;

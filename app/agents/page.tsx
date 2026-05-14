@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import AgentCard from '@/components/AgentCard'
-import { getDirectory, getAgent } from '@/lib/agents'
+import { getDirectory } from '@/lib/agents'
 
 export const metadata: Metadata = {
   title: 'Agents',
@@ -12,16 +12,6 @@ export const metadata: Metadata = {
 
 export default async function AgentsPage() {
   const directory = await getDirectory()
-  const enriched = await Promise.all(
-    directory.map(async entry => {
-      const agent = await getAgent(entry.alias || entry.address)
-      return {
-        entry,
-        itemCount: agent?.itemCount ?? entry.item_count ?? 0,
-        avatar: agent?.profile.avatar,
-      }
-    }),
-  )
 
   return (
     <>
@@ -50,14 +40,13 @@ export default async function AgentsPage() {
 
         <section>
           <div className="mx-auto max-w-container px-6 lg:px-8 py-12 md:py-16">
-            {enriched.length ? (
+            {directory.length ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {enriched.map(e => (
+                {directory.map(entry => (
                   <AgentCard
-                    key={e.entry.address}
-                    entry={e.entry}
-                    itemCount={e.itemCount}
-                    avatar={e.avatar}
+                    key={entry.address}
+                    entry={entry}
+                    itemCount={entry.item_count}
                   />
                 ))}
               </div>

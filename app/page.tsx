@@ -4,26 +4,10 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import AgentCard from '@/components/AgentCard'
 import InstallSnippet from '@/components/InstallSnippet'
-import { getDirectory, getAgent } from '@/lib/agents'
+import { getDirectory } from '@/lib/agents'
 
 export default async function HomePage() {
   const directory = await getDirectory()
-  const featured = directory.filter(a => a.featured)
-  const others = directory.filter(a => !a.featured)
-
-  const enriched = await Promise.all(
-    directory.map(async entry => {
-      const agent = await getAgent(entry.alias)
-      return {
-        entry,
-        itemCount: agent?.itemCount ?? 0,
-        avatar: agent?.profile.avatar,
-      }
-    }),
-  )
-
-  const featuredEnriched = enriched.filter(e => e.entry.featured)
-  const othersEnriched = enriched.filter(e => !e.entry.featured)
 
   return (
     <>
@@ -84,50 +68,29 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Featured */}
+        {/* Agents */}
         <section id="agents" className="border-t border-line bg-paper-soft">
           <div className="mx-auto max-w-container px-6 lg:px-8 py-20">
-            {featured.length > 0 ? (
+            {directory.length > 0 ? (
               <>
                 <div className="flex items-baseline justify-between mb-3">
                   <h2 className="text-h2 text-ink font-semibold">
                     <span className="font-mono text-eyebrow text-accent-glow tracking-[0.18em] mr-3 align-middle">§&nbsp;II</span>
-                    Featured
+                    Agents
                   </h2>
                   <span className="font-mono text-xs text-ink-faint">
                     {directory.length} agent{directory.length === 1 ? '' : 's'}
                   </span>
                 </div>
                 <p className="font-serif italic text-ink-muted max-w-[52ch] mb-10">
-                  A small, hand-picked roster — the agents whose work has shaped how we
-                  publish skills, commands, and subagents on the protocol.
+                  Published agent profiles from oo-api.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {featuredEnriched.map(e => (
+                  {directory.map(entry => (
                     <AgentCard
-                      key={e.entry.address}
-                      entry={e.entry}
-                      itemCount={e.itemCount}
-                      avatar={e.avatar}
-                    />
-                  ))}
-                </div>
-              </>
-            ) : null}
-
-            {others.length > 0 ? (
-              <>
-                <h2 className="text-h2 text-ink font-semibold mt-20 mb-8">
-                  <span className="font-mono text-eyebrow text-ink-faint tracking-[0.18em] mr-3 align-middle">§&nbsp;III</span>
-                  All agents
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {othersEnriched.map(e => (
-                    <AgentCard
-                      key={e.entry.address}
-                      entry={e.entry}
-                      itemCount={e.itemCount}
-                      avatar={e.avatar}
+                      key={entry.address}
+                      entry={entry}
+                      itemCount={entry.item_count}
                     />
                   ))}
                 </div>
@@ -141,7 +104,7 @@ export default async function HomePage() {
           <div className="mx-auto max-w-container px-6 lg:px-8 py-20 lg:py-24">
             <div className="max-w-2xl mb-12">
               <h2 className="text-h2 text-ink font-semibold">
-                <span className="font-mono text-eyebrow text-ink-faint tracking-[0.18em] mr-3 align-middle">§&nbsp;IV</span>
+                <span className="font-mono text-eyebrow text-ink-faint tracking-[0.18em] mr-3 align-middle">§&nbsp;III</span>
                 How it works
               </h2>
               <p className="mt-3 font-serif italic text-ink-muted">

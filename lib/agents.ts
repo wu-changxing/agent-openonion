@@ -48,10 +48,7 @@ export type DirectoryEntry = {
   alias: string
   name: string
   tagline: string
-  repo: string
-  ref: string
   tags: string[]
-  featured: boolean
   item_count?: number
   updated_at?: string
 }
@@ -113,10 +110,7 @@ type OoDirectory = {
     alias?: string
     name?: string
     tagline?: string
-    repo?: string
-    ref?: string
     tags?: string[]
-    featured?: boolean
     item_count?: number
     updated_at?: string
   }>
@@ -152,10 +146,7 @@ function toDirectoryEntry(entry: OoDirectory['agents'][number]): DirectoryEntry 
     alias,
     name: entry.name || alias,
     tagline: entry.tagline || '',
-    repo: entry.repo || '',
-    ref: entry.ref || '',
     tags: entry.tags || [],
-    featured: Boolean(entry.featured),
     item_count: entry.item_count,
     updated_at: entry.updated_at,
   }

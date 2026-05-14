@@ -9,8 +9,6 @@ export async function GET() {
     address: a.address,
     alias: a.alias,
     name: a.name,
-    repo: a.repo,
-    ref: a.ref,
     tags: a.tags,
   }))
   return NextResponse.json(

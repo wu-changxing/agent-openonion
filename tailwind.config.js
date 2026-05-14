@@ -44,9 +44,9 @@ module.exports = {
       },
       fontSize: {
         eyebrow: ['0.6875rem', { lineHeight: '1', letterSpacing: '0.18em' }],
-        display: ['clamp(2.5rem, 6vw, 4.5rem)', { lineHeight: '1', letterSpacing: '-0.04em' }],
-        h1: ['clamp(2rem, 4vw, 3rem)', { lineHeight: '1.05', letterSpacing: '-0.03em' }],
-        h2: ['1.5rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
+        display: ['3.5rem', { lineHeight: '1', letterSpacing: '0' }],
+        h1: ['2.75rem', { lineHeight: '1.05', letterSpacing: '0' }],
+        h2: ['1.5rem', { lineHeight: '1.2', letterSpacing: '0' }],
       },
       animation: {
         rise: 'rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
